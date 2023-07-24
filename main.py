@@ -1,5 +1,5 @@
 import psycopg2
-from src.api import scrape_employers, create_tables, insert_data_to_tables, create_database
+from src.database_work import scrape_employers, create_tables, insert_data_to_tables, create_database
 from src.DBManager import DBManager
 
 company_names = ['Яндекс', 'Digital Reputation', 'Ozon Fintech', 'SberTech', 'ЛАНИТ',
