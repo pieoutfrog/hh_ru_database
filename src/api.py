@@ -23,12 +23,14 @@ for company_name in company_names:
             vacancies_url = f"https://api.hh.ru/vacancies?employer_id={employer_id}"
             employer_name = company['name']
             employer_url = company['alternate_url']
+            count_open_vacancies = company['open_vacancies']
             response = requests.get(vacancies_url, params={'access_token': api_key})
             vacancies_data = response.json()
             employers.append({
                 'employer_id': employer_id,
                 'employer_name': employer_name,
-                'employer_url': employer_url
+                'employer_url': employer_url,
+                'count_open_vacancies': count_open_vacancies
             })
             for vacancy in vacancies_data['items']:
 
@@ -41,7 +43,6 @@ for company_name in company_names:
                     'salary': vacancy['salary']['from'] if vacancy['salary'] is not None else None,
                     'vacancy_id': vacancy['id']
                 })
-
     conn = psycopg2.connect(
         host='localhost',
         database='hh_ru',
@@ -55,7 +56,8 @@ for company_name in company_names:
     CREATE TABLE IF NOT EXISTS employers (
         employer_id serial PRIMARY KEY,
         employer_name varchar(100) NOT NULL,
-        employer_url varchar(100) NOT NULL
+        employer_url varchar(100) NOT NULL,
+        open_vacancies int
     )
     '''
 
@@ -76,10 +78,11 @@ for company_name in company_names:
 
             # Вставка данных о работодателях
             for employer in employers:
-                insert_employer_query = "INSERT INTO employers (employer_id, employer_name, employer_url) VALUES (%s, %s, %s)"
-                employer_data = (employer['employer_id'], employer['employer_name'], employer['employer_url'])
+                insert_employer_query = "INSERT INTO employers (employer_id, employer_name, employer_url, count_open_vacancies) VALUES (%s, %s, %s, %s)"
+                employer_data = (employer['employer_id'], employer['employer_name'], employer['employer_url'], employer['count_open_vacancies'])
                 with conn.cursor() as cursor:
                     cursor.execute(insert_employer_query, employer_data)
+
 
             # Вставка данных о вакансиях
             for vacancy in vacancies:
