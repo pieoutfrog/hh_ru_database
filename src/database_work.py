@@ -4,6 +4,7 @@ import psycopg2
 
 def scrape_employers(company_names, api_key, url):
     """
+    Подключение к API, получение данных
     :param company_names: Список названия компаний
     :param api_key: Ключ доступа к API HeadHunter
     :param url: базовая ссылка для просмотра работодателей
